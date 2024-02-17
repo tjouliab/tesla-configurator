@@ -12,6 +12,7 @@
     </mat-form-field>
   </div>
   <div class="field-container">
+    @if(selectedModelCode.length > 0) {
     <p>Color:</p>
     <mat-form-field appearance="fill">
       <mat-label>Color</mat-label>
@@ -21,8 +22,10 @@
         }
       </mat-select>
     </mat-form-field>
+    }
   </div>
 </form>
+@if(selectedModelCode.length > 0 && selectedColorCode.length > 0) {
 <img
   [src]="
     'https://interstate21.com/tesla-app/images/' +
@@ -32,3 +35,4 @@
     '.jpg'
   "
 />
+}

@@ -45,20 +45,6 @@ export class StepOneComponent {
     this.modelsService.getAll().subscribe({
       next: (result) => {
         this.allModelInformations = result;
-
-        // Initialize the Form with first car model found
-        if (result.length > 0) {
-          if (result[0].colors.length > 0) {
-            this.selectedModelCode = result[0].code;
-            this.selectedColorCode = result[0].colors[0].code;
-            this.colors = result[0].colors;
-
-            this.modelColorForm.patchValue({
-              modelSelect: this.selectedModelCode,
-              colorSelect: this.selectedColorCode,
-            });
-          }
-        }
       },
       error: (error) => console.error(error),
     });
