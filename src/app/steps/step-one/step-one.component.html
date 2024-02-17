@@ -1,1 +1,34 @@
-<p>step-one works!</p>
+<h1>Step 1: Choose your Model and color</h1>
+<form class="model-color-form" [formGroup]="modelColorForm">
+  <div class="field-container">
+    <p>Model:</p>
+    <mat-form-field appearance="fill">
+      <mat-label>Model</mat-label>
+      <mat-select formControlName="modelSelect">
+        @for (model of allModelInformations; track model) {
+        <mat-option [value]="model.code">{{ model.description }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="field-container">
+    <p>Color:</p>
+    <mat-form-field appearance="fill">
+      <mat-label>Color</mat-label>
+      <mat-select formControlName="colorSelect">
+        @for (color of colors; track color) {
+        <mat-option [value]="color.code">{{ color.description }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+</form>
+<img
+  [src]="
+    'https://interstate21.com/tesla-app/images/' +
+    selectedModelCode +
+    '/' +
+    selectedColorCode +
+    '.jpg'
+  "
+/>
