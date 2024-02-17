@@ -14,6 +14,11 @@ import {
   ModelColorsInformation,
 } from '../../../dto/model-colors-information';
 
+interface ModelColorFormGroup {
+  modelControl: FormControl<string | null>;
+  colorControl: FormControl<string | null>;
+}
+
 @Component({
   selector: 'app-step-one',
   standalone: true,
@@ -28,20 +33,21 @@ import {
 })
 export class StepOneComponent {
   allModelInformations: ModelColorsInformation[] = [];
+
+  modelColorForm: FormGroup<ModelColorFormGroup> =
+    new FormGroup<ModelColorFormGroup>({
+      modelControl: new FormControl<string>('', Validators.required),
+      colorControl: new FormControl<string>('', Validators.required),
+    });
+
   colors: Color[] = [];
-
-  modelColorForm = new FormGroup({
-    modelControl: new FormControl('', Validators.required),
-    colorControl: new FormControl('', Validators.required),
-  });
-
   selectedModelCode: string = '';
   selectedColorCode: string = '';
 
   constructor(private modelsService: ModelsService) {}
 
   ngOnInit(): void {
-    // Get all the car informations from API
+    // Get all the cars informations from API
     this.modelsService.getAll().subscribe({
       next: (result: ModelColorsInformation[]) => {
         this.allModelInformations = result;
@@ -57,9 +63,10 @@ export class StepOneComponent {
         return;
       }
 
-      const selectedModel = this.allModelInformations.find(
-        (modelInfo) => modelInfo.code === newValues.modelControl
-      );
+      const selectedModel: ModelColorsInformation | undefined =
+        this.allModelInformations.find(
+          (modelInfo) => modelInfo.code === newValues.modelControl
+        );
 
       this.selectedModelCode = selectedModel?.code ?? '';
       this.colors = selectedModel?.colors ?? [];

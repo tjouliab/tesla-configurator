@@ -1,1 +1,27 @@
-<p>step-two works!</p>
+<h1>Step 2: Select your config and options</h1>
+<form [formGroup]="configOptionsForm">
+  <div class="field-container">
+    <p>Config:</p>
+    <mat-form-field appearance="fill">
+      <mat-label>Config</mat-label>
+      <mat-select id="configSelect" formControlName="configControl">
+        @for (config of modelConfigOptions.configs; track config) {
+        <mat-option [value]="config.id">{{ config.description }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <p *ngIf="displayedConfig.id >= 1">
+    Range: {{ displayedConfig.range }} miles<br />
+    Max speed: {{ displayedConfig.speed }} mph<br />
+    Cost: {{ displayedConfig.price | currency }}
+  </p>
+  <div *ngIf="modelConfigOptions.towHitch">
+    <mat-label>Tow hitch ?</mat-label>
+    <mat-checkbox id="includeTow" formControlName="towHitchControl" />
+  </div>
+  <div *ngIf="modelConfigOptions.yoke">
+    <mat-label>Yoke steering wheel ?</mat-label>
+    <mat-checkbox id="includeYoke" formControlName="yokeSteeringWheelControl" />
+  </div>
+</form>
