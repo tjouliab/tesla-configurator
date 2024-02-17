@@ -4,7 +4,7 @@
     <p>Model:</p>
     <mat-form-field appearance="fill">
       <mat-label>Model</mat-label>
-      <mat-select formControlName="modelSelect">
+      <mat-select id="modelSelect" formControlName="modelControl">
         @for (model of allModelInformations; track model) {
         <mat-option [value]="model.code">{{ model.description }}</mat-option>
         }
@@ -16,7 +16,7 @@
     <p>Color:</p>
     <mat-form-field appearance="fill">
       <mat-label>Color</mat-label>
-      <mat-select formControlName="colorSelect">
+      <mat-select id="colorSelect" formControlName="colorControl">
         @for (color of colors; track color) {
         <mat-option [value]="color.code">{{ color.description }}</mat-option>
         }

@@ -31,8 +31,8 @@ export class StepOneComponent {
   colors: Color[] = [];
 
   modelColorForm = new FormGroup({
-    modelSelect: new FormControl('', Validators.required),
-    colorSelect: new FormControl('', Validators.required),
+    modelControl: new FormControl('', Validators.required),
+    colorControl: new FormControl('', Validators.required),
   });
 
   selectedModelCode: string = '';
@@ -43,7 +43,7 @@ export class StepOneComponent {
   ngOnInit(): void {
     // Get all the car informations from API
     this.modelsService.getAll().subscribe({
-      next: (result) => {
+      next: (result: ModelColorsInformation[]) => {
         this.allModelInformations = result;
       },
       error: (error) => console.error(error),
@@ -52,13 +52,13 @@ export class StepOneComponent {
     // Subscribe to Form changes
     this.modelColorForm.valueChanges.subscribe((newValues) => {
       // We need to update the Form only if the car model has changed
-      if (this.selectedModelCode === newValues.modelSelect) {
-        this.selectedColorCode = newValues?.colorSelect ?? '';
+      if (this.selectedModelCode === newValues.modelControl) {
+        this.selectedColorCode = newValues?.colorControl ?? '';
         return;
       }
 
       const selectedModel = this.allModelInformations.find(
-        (modelInfo) => modelInfo.code === newValues.modelSelect
+        (modelInfo) => modelInfo.code === newValues.modelControl
       );
 
       this.selectedModelCode = selectedModel?.code ?? '';
@@ -68,7 +68,7 @@ export class StepOneComponent {
       // Set emitEvent to false to avoid infinite loops
       this.modelColorForm.patchValue(
         {
-          colorSelect: this.colors[0].code,
+          colorControl: this.colors[0].code,
         },
         { emitEvent: false }
       );
