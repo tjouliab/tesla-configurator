@@ -25,3 +25,14 @@
     <mat-checkbox id="includeYoke" formControlName="yokeSteeringWheelControl" />
   </div>
 </form>
+@if (colorCode.length > 0) {
+<img
+  [src]="
+    'https://interstate21.com/tesla-app/images/' +
+    modelCode +
+    '/' +
+    colorCode +
+    '.jpg'
+  "
+/>
+}

@@ -38,3 +38,14 @@
     </div>
   </div>
 </div>
+@if (modelCode.length > 0 && selectedColor.code.length > 0) {
+<img
+  [src]="
+    'https://interstate21.com/tesla-app/images/' +
+    modelCode +
+    '/' +
+    selectedColor.code +
+    '.jpg'
+  "
+/>
+}

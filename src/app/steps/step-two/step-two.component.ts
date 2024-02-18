@@ -35,6 +35,7 @@ interface ConfigOptionsFormGroup {
 })
 export class StepTwoComponent {
   modelCode: string = 'S';
+  colorCode: string = '';
 
   modelConfigOptions: ModelConfigOptions = {
     configs: [],
@@ -72,6 +73,7 @@ export class StepTwoComponent {
             return EMPTY;
           } else {
             this.modelCode = stepOneData.modelCode;
+            this.colorCode = stepOneData.selectedColor.code;
             // Get all the car config options from API
             return this.optionsService.getOneByCode(this.modelCode);
           }
