@@ -5,39 +5,46 @@ import {
   StepOneDataOutput,
   StepTwoDataOutput,
 } from './steps-data.dto';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class StepsDataService {
-  private stepOneData: StepOneDataOutput = DEFAULT_STEP_ONE_DATA_OUTPUT;
-  private stepTwoData: StepTwoDataOutput = DEFAULT_STEP_TWO_DATA_OUTPUT;
+  private stepOneData: BehaviorSubject<StepOneDataOutput> =
+    new BehaviorSubject<StepOneDataOutput>(DEFAULT_STEP_ONE_DATA_OUTPUT);
+  private stepTwoData: BehaviorSubject<StepTwoDataOutput> =
+    new BehaviorSubject<StepTwoDataOutput>(DEFAULT_STEP_TWO_DATA_OUTPUT);
 
   // Step One
   setStepOneData(dataOutput: StepOneDataOutput): void {
-    this.stepOneData = dataOutput;
+    this.stepOneData.next(dataOutput);
   }
-  getStepOneData(): StepOneDataOutput {
-    return this.stepOneData;
+  getStepOneData(): Observable<StepOneDataOutput> {
+    return this.stepOneData.asObservable();
   }
-  isStepOneDataDefault(): boolean {
-    return this.stepOneData.modelCode === '';
+  isStepOneDataDefault(): Observable<boolean> {
+    return this.stepOneData.pipe(
+      map((data: StepOneDataOutput) => data.modelCode === '')
+    );
   }
   resetStepOneData(): void {
-    this.stepOneData = DEFAULT_STEP_ONE_DATA_OUTPUT;
+    this.stepOneData.next(DEFAULT_STEP_ONE_DATA_OUTPUT);
   }
 
   // Step Two
   setStepTwoData(dataOutput: StepTwoDataOutput): void {
-    this.stepTwoData = dataOutput;
+    this.stepTwoData.next(dataOutput);
   }
-  getStepTwoData(): StepTwoDataOutput {
-    return this.stepTwoData;
+  getStepTwoData(): Observable<StepTwoDataOutput> {
+    return this.stepTwoData.asObservable();
   }
-  isStepTwoDataDefault(): boolean {
-    return this.stepTwoData.selectedConfig.id === -1;
+  isStepTwoDataDefault(): Observable<boolean> {
+    return this.stepTwoData.pipe(
+      map((data: StepTwoDataOutput) => data.selectedConfig.id === -1)
+    );
   }
   resetStepTwoData(): void {
-    this.stepTwoData = DEFAULT_STEP_TWO_DATA_OUTPUT;
+    this.stepTwoData.next(DEFAULT_STEP_TWO_DATA_OUTPUT);
   }
 }

@@ -9,3 +9,8 @@
   justify-content: center;
   width: 100%;
 }
+.routing-element.disabled {
+  color: grey;
+  pointer-events: none;
+  cursor: default;
+}

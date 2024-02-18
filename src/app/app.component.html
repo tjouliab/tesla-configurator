@@ -1,6 +1,6 @@
 <nav class="navigation-row">
   <a class="routing-element" routerLink="/step1">Step 1</a>
-  <a class="routing-element" routerLink="/step2">Step 2</a>
-  <a class="routing-element" routerLink="/step3">Step 3</a>
+  <a class="routing-element" routerLink="/step2" [class.disabled]="!isStepTwoActive">Step 2</a>
+  <a class="routing-element" routerLink="/step3" [class.disabled]="!isStepThreeActive">Step 3</a>
 </nav>
 <router-outlet></router-outlet>

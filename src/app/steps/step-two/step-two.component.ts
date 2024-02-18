@@ -12,6 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { StepsDataService } from '../steps-data.service';
+import { EMPTY, switchMap } from 'rxjs';
 
 interface ConfigOptionsFormGroup {
   configControl: FormControl<number | null>;
@@ -60,33 +61,43 @@ export class StepTwoComponent {
   ) {}
 
   ngOnInit(): void {
-    if (!this.stepsDataService.isStepOneDataDefault()) {
-      this.modelCode = this.stepsDataService.getStepOneData().modelCode;
-      this.stepsDataService.resetStepTwoData();
-    }
+    this.stepsDataService.resetStepTwoData();
 
-    // Get all the car config options from API
-    this.optionsService.getOneByCode(this.modelCode).subscribe({
-      next: (result: ModelConfigOptions) => {
-        this.modelConfigOptions = result;
+    this.stepsDataService
+      .getStepOneData()
+      .pipe(
+        switchMap((stepOneData) => {
+          if (stepOneData.modelCode === '') {
+            // If step 1 is not valid, return an empty observable to stop
+            return EMPTY;
+          } else {
+            this.modelCode = stepOneData.modelCode;
+            // Get all the car config options from API
+            return this.optionsService.getOneByCode(this.modelCode);
+          }
+        })
+      )
+      .subscribe({
+        next: (result: ModelConfigOptions) => {
+          this.modelConfigOptions = result;
 
-        // Add formControls only if needed
-        if (result.towHitch) {
-          this.configOptionsForm.addControl(
-            'towHitchControl',
-            new FormControl<boolean>(false)
-          );
-        }
+          // Add formControls only if needed
+          if (result.towHitch) {
+            this.configOptionsForm.addControl(
+              'towHitchControl',
+              new FormControl<boolean>(false)
+            );
+          }
 
-        if (result.yoke) {
-          this.configOptionsForm.addControl(
-            'yokeSteeringWheelControl',
-            new FormControl<boolean>(false)
-          );
-        }
-      },
-      error: (error) => console.error(error),
-    });
+          if (result.yoke) {
+            this.configOptionsForm.addControl(
+              'yokeSteeringWheelControl',
+              new FormControl<boolean>(false)
+            );
+          }
+        },
+        error: (error) => console.error(error),
+      });
 
     // Subscribe to Form changes
     this.configOptionsForm.valueChanges.subscribe((newValues) => {

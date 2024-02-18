@@ -3,6 +3,7 @@ import { StepsDataService } from '../steps-data.service';
 import { Color } from '../../../dto/model-colors-information';
 import { Config } from '../../../dto/model-config-options';
 import { CommonModule } from '@angular/common';
+import { StepOneDataOutput, StepTwoDataOutput } from '../steps-data.dto';
 
 @Component({
   selector: 'app-step-three',
@@ -36,25 +37,23 @@ export class StepThreeComponent {
   constructor(private stepsDataService: StepsDataService) {}
 
   ngOnInit(): void {
-    if (
-      this.stepsDataService.isStepOneDataDefault() ||
-      this.stepsDataService.isStepTwoDataDefault()
-    ) {
-      return;
-    }
-    const { modelCode, modelDescription, selectedColor } =
-      this.stepsDataService.getStepOneData();
-    this.modelCode = modelCode;
-    this.modelDescription = modelDescription;
-    this.selectedColor = selectedColor;
+    this.stepsDataService.getStepOneData().subscribe({
+      next: (result: StepOneDataOutput) => {
+        this.modelCode = result.modelCode;
+        this.modelDescription = result.modelDescription;
+        this.selectedColor = result.selectedColor;
+        this.updateTotalCost();
+      },
+    });
 
-    const { selectedConfig, towHitchOption, yokeOption } =
-      this.stepsDataService.getStepTwoData();
-    this.selectedConfig = selectedConfig;
-    this.towHitchOption = towHitchOption;
-    this.yokeOption = yokeOption;
-
-    this.updateTotalCost();
+    this.stepsDataService.getStepTwoData().subscribe({
+      next: (result: StepTwoDataOutput) => {
+        this.selectedConfig = result.selectedConfig;
+        this.towHitchOption = result.towHitchOption;
+        this.yokeOption = result.yokeOption;
+        this.updateTotalCost();
+      },
+    });
   }
 
   private updateTotalCost(): void {
