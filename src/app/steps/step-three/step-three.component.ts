@@ -4,6 +4,7 @@ import { Color } from '../../../dto/model-colors-information';
 import { Config } from '../../../dto/model-config-options';
 import { CommonModule } from '@angular/common';
 import { StepOneDataOutput, StepTwoDataOutput } from '../steps-data.dto';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-step-three',
@@ -34,26 +35,32 @@ export class StepThreeComponent {
 
   totalCost: number = 0;
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(private stepsDataService: StepsDataService) {}
 
   ngOnInit(): void {
-    this.stepsDataService.getStepOneData().subscribe({
-      next: (result: StepOneDataOutput) => {
-        this.modelCode = result.modelCode;
-        this.modelDescription = result.modelDescription;
-        this.selectedColor = result.selectedColor;
-        this.updateTotalCost();
-      },
-    });
+    this.subscriptions.add(
+      this.stepsDataService.getStepOneData().subscribe({
+        next: (result: StepOneDataOutput) => {
+          this.modelCode = result.modelCode;
+          this.modelDescription = result.modelDescription;
+          this.selectedColor = result.selectedColor;
+          this.updateTotalCost();
+        },
+      })
+    );
 
-    this.stepsDataService.getStepTwoData().subscribe({
-      next: (result: StepTwoDataOutput) => {
-        this.selectedConfig = result.selectedConfig;
-        this.towHitchOption = result.towHitchOption;
-        this.yokeOption = result.yokeOption;
-        this.updateTotalCost();
-      },
-    });
+    this.subscriptions.add(
+      this.stepsDataService.getStepTwoData().subscribe({
+        next: (result: StepTwoDataOutput) => {
+          this.selectedConfig = result.selectedConfig;
+          this.towHitchOption = result.towHitchOption;
+          this.yokeOption = result.yokeOption;
+          this.updateTotalCost();
+        },
+      })
+    );
   }
 
   private updateTotalCost(): void {
@@ -69,5 +76,10 @@ export class StepThreeComponent {
     }
 
     this.totalCost = totalCost;
+  }
+
+  ngOnDestroy(): void {
+    // Unsubscribe to prevent memory leaks
+    this.subscriptions.unsubscribe();
   }
 }

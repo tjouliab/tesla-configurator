@@ -14,6 +14,7 @@ import {
   ModelColorsInformation,
 } from '../../../dto/model-colors-information';
 import { StepsDataService } from '../steps-data.service';
+import { Subscription } from 'rxjs';
 
 interface ModelColorFormGroup {
   modelControl: FormControl<string | null>;
@@ -45,6 +46,8 @@ export class StepOneComponent {
   selectedModelCode: string = '';
   selectedColorCode: string = '';
 
+  private subscriptions: Subscription = new Subscription();
+
   constructor(
     private modelsService: ModelsService,
     private stepsDataService: StepsDataService
@@ -52,42 +55,47 @@ export class StepOneComponent {
 
   ngOnInit(): void {
     // Get all the cars informations from API
-    this.modelsService.getAll().subscribe({
-      next: (result: ModelColorsInformation[]) => {
-        this.allModelInformations = result;
+    this.subscriptions.add(
+      this.modelsService.getAll().subscribe({
+        next: (result: ModelColorsInformation[]) => {
+          this.allModelInformations = result;
 
-        // Reset data stored for step one to default
-        this.stepsDataService.resetStepOneData();
-      },
-      error: (error) => console.error(error),
-    });
+          // Reset data stored for step 1 & 2 to default
+          this.stepsDataService.resetStepOneData();
+          this.stepsDataService.resetStepTwoData();
+        },
+        error: (error) => console.error(error),
+      })
+    );
 
     // Subscribe to Form changes
-    this.modelColorForm.valueChanges.subscribe((newValues) => {
-      // We need to update the Form only if the car model has changed
-      if (this.selectedModelCode === newValues?.modelControl) {
-        this.selectedColorCode = newValues?.colorControl ?? '';
-      } else {
-        const selectedModel: ModelColorsInformation | undefined =
-          this.allModelInformations.find(
-            (modelInfo) => modelInfo.code === newValues.modelControl
+    this.subscriptions.add(
+      this.modelColorForm.valueChanges.subscribe((newValues) => {
+        // We need to update the Form only if the car model has changed
+        if (this.selectedModelCode === newValues?.modelControl) {
+          this.selectedColorCode = newValues?.colorControl ?? '';
+        } else {
+          const selectedModel: ModelColorsInformation | undefined =
+            this.allModelInformations.find(
+              (modelInfo) => modelInfo.code === newValues.modelControl
+            );
+
+          this.selectedModelCode = selectedModel?.code ?? '';
+          this.colors = selectedModel?.colors ?? [];
+          this.selectedColorCode = this.colors[0]?.code ?? '';
+
+          // Set emitEvent to false to avoid infinite loops
+          this.modelColorForm.patchValue(
+            {
+              colorControl: this.colors[0].code,
+            },
+            { emitEvent: false }
           );
+        }
 
-        this.selectedModelCode = selectedModel?.code ?? '';
-        this.colors = selectedModel?.colors ?? [];
-        this.selectedColorCode = this.colors[0]?.code ?? '';
-
-        // Set emitEvent to false to avoid infinite loops
-        this.modelColorForm.patchValue(
-          {
-            colorControl: this.colors[0].code,
-          },
-          { emitEvent: false }
-        );
-      }
-
-      this.setStepData(this.selectedModelCode, this.selectedColorCode);
-    });
+        this.setStepData(this.selectedModelCode, this.selectedColorCode);
+      })
+    );
   }
 
   private setStepData(modelCode: string, colorCode: string): void {
@@ -107,5 +115,10 @@ export class StepOneComponent {
         selectedColor,
       });
     }
+  }
+
+  ngOnDestroy(): void {
+    // Unsubscribe to prevent memory leaks
+    this.subscriptions.unsubscribe();
   }
 }
