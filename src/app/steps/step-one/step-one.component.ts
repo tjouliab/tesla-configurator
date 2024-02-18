@@ -13,6 +13,7 @@ import {
   Color,
   ModelColorsInformation,
 } from '../../../dto/model-colors-information';
+import { StepsDataService } from '../steps-data.service';
 
 interface ModelColorFormGroup {
   modelControl: FormControl<string | null>;
@@ -44,13 +45,19 @@ export class StepOneComponent {
   selectedModelCode: string = '';
   selectedColorCode: string = '';
 
-  constructor(private modelsService: ModelsService) {}
+  constructor(
+    private modelsService: ModelsService,
+    private stepsDataService: StepsDataService
+  ) {}
 
   ngOnInit(): void {
     // Get all the cars informations from API
     this.modelsService.getAll().subscribe({
       next: (result: ModelColorsInformation[]) => {
         this.allModelInformations = result;
+
+        // Reset data stored for step one to default
+        this.stepsDataService.resetStepOneData();
       },
       error: (error) => console.error(error),
     });
@@ -58,27 +65,47 @@ export class StepOneComponent {
     // Subscribe to Form changes
     this.modelColorForm.valueChanges.subscribe((newValues) => {
       // We need to update the Form only if the car model has changed
-      if (this.selectedModelCode === newValues.modelControl) {
+      if (this.selectedModelCode === newValues?.modelControl) {
         this.selectedColorCode = newValues?.colorControl ?? '';
-        return;
+      } else {
+        const selectedModel: ModelColorsInformation | undefined =
+          this.allModelInformations.find(
+            (modelInfo) => modelInfo.code === newValues.modelControl
+          );
+
+        this.selectedModelCode = selectedModel?.code ?? '';
+        this.colors = selectedModel?.colors ?? [];
+        this.selectedColorCode = this.colors[0]?.code ?? '';
+
+        // Set emitEvent to false to avoid infinite loops
+        this.modelColorForm.patchValue(
+          {
+            colorControl: this.colors[0].code,
+          },
+          { emitEvent: false }
+        );
       }
 
-      const selectedModel: ModelColorsInformation | undefined =
-        this.allModelInformations.find(
-          (modelInfo) => modelInfo.code === newValues.modelControl
-        );
-
-      this.selectedModelCode = selectedModel?.code ?? '';
-      this.colors = selectedModel?.colors ?? [];
-      this.selectedColorCode = this.colors[0]?.code ?? '';
-
-      // Set emitEvent to false to avoid infinite loops
-      this.modelColorForm.patchValue(
-        {
-          colorControl: this.colors[0].code,
-        },
-        { emitEvent: false }
-      );
+      this.setStepData(this.selectedModelCode, this.selectedColorCode);
     });
+  }
+
+  private setStepData(modelCode: string, colorCode: string): void {
+    const selectedModel: ModelColorsInformation | undefined =
+      this.allModelInformations.find(
+        (modelInfo) => modelInfo.code === modelCode
+      );
+
+    const selectedColor: Color | undefined = this.colors.find(
+      (color) => color.code === colorCode
+    );
+
+    if (selectedModel && selectedColor) {
+      this.stepsDataService.setStepOneData({
+        modelCode,
+        modelDescription: selectedModel.description,
+        selectedColor,
+      });
+    }
   }
 }

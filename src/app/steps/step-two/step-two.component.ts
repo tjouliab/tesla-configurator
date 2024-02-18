@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { StepsDataService } from '../steps-data.service';
 
 interface ConfigOptionsFormGroup {
   configControl: FormControl<number | null>;
@@ -32,7 +33,6 @@ interface ConfigOptionsFormGroup {
   styleUrl: './step-two.component.scss',
 })
 export class StepTwoComponent {
-  @Input()
   modelCode: string = 'S';
 
   modelConfigOptions: ModelConfigOptions = {
@@ -54,13 +54,20 @@ export class StepTwoComponent {
     price: -1,
   };
 
-  constructor(private optionsService: OptionsService) {}
+  constructor(
+    private optionsService: OptionsService,
+    private stepsDataService: StepsDataService
+  ) {}
 
   ngOnInit(): void {
+    if (!this.stepsDataService.isStepOneDataDefault()) {
+      this.modelCode = this.stepsDataService.getStepOneData().modelCode;
+      this.stepsDataService.resetStepTwoData();
+    }
+
     // Get all the car config options from API
     this.optionsService.getOneByCode(this.modelCode).subscribe({
       next: (result: ModelConfigOptions) => {
-        console.log('result', result);
         this.modelConfigOptions = result;
 
         // Add formControls only if needed
@@ -83,7 +90,6 @@ export class StepTwoComponent {
 
     // Subscribe to Form changes
     this.configOptionsForm.valueChanges.subscribe((newValues) => {
-      console.log('newValues', newValues);
       const currentConfigId: number = newValues?.configControl ?? -1;
       const currentConfig: Config | undefined =
         this.modelConfigOptions.configs.find(
@@ -93,6 +99,12 @@ export class StepTwoComponent {
         return;
       }
       this.displayedConfig = currentConfig;
+      this.stepsDataService.setStepTwoData({
+        selectedConfig: currentConfig,
+        towHitchOption: this.configOptionsForm.value?.towHitchControl ?? false,
+        yokeOption:
+          this.configOptionsForm.value?.yokeSteeringWheelControl ?? false,
+      });
     });
   }
 }
