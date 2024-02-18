@@ -1,0 +1,25 @@
+.container {
+  display: grid;
+  grid-template-columns: 20vw 10vw;
+  align-items: start;
+}
+
+.options-col,
+.prices-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.options-col-element {
+  height: 25px;
+}
+
+.total-label,
+.total-price {
+  margin-top: auto;
+  border-top: 2px solid white;
+}
+
+.prices-col {
+  text-align: left;
+}

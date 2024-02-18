@@ -1,1 +1,40 @@
-<p>step-three works!</p>
+<h1>Step 3: Summary</h1>
+<h2>Your Tesla {{ modelDescription }}</h2>
+<div class="container">
+  <div class="options-col">
+    <div class="options-col-element">
+      <b> {{ selectedConfig.description }} </b>
+    </div>
+    <div class="options-col-element">
+      Range: {{ selectedConfig.range }} miles
+    </div>
+    <div class="options-col-element">
+      Max speed: {{ selectedConfig.speed }} mph
+    </div>
+    <div class="options-col-element">
+      <b>{{ selectedColor.description }}</b>
+    </div>
+    <div *ngIf="towHitchOption" class="options-col-element">
+      <b>Tow Hitch Package</b>
+    </div>
+    <div *ngIf="yokeOption" class="options-col-element">
+      <b>Yoke Steering Wheel</b>
+    </div>
+    <div class="options-col-element total-label"><b>TOTAL COST</b></div>
+  </div>
+  <div class="prices-col">
+    <div class="options-col-element">{{ selectedConfig.price | currency }}</div>
+    <div class="options-col-element"></div>
+    <div class="options-col-element"></div>
+    <div class="options-col-element">{{ selectedColor.price | currency }}</div>
+    <div *ngIf="towHitchOption" class="options-col-element">
+      {{ optionsCost | currency }}
+    </div>
+    <div *ngIf="yokeOption" class="options-col-element">
+      {{ optionsCost | currency }}
+    </div>
+    <div class="options-col-element total-price">
+      {{ totalCost | currency }}
+    </div>
+  </div>
+</div>

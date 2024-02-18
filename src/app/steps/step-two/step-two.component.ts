@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { OptionsService } from '../../../services/options.service';
 import { Config, ModelConfigOptions } from '../../../dto/model-config-options';
 import {
